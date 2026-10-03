@@ -7,5 +7,6 @@
     "types": ["jest", "node"],
     "skipLibCheck": true
   },
-  "include": ["test/**/*.ts"]
+   "include": ["**/*.ts"],
+  "exclude": ["node_modules"]
 }

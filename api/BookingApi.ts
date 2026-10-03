@@ -1,29 +1,31 @@
-import {ApiClient}  from './ApiClient';
-import {Booking} from '../test-data/dataObject'
+import { ApiClient } from './ApiClient';
+import { Booking, BookingData } from '../test-data/dataObject';
 
 export class BookingApi {
   constructor(private apiClient: ApiClient) {}
 
-  async createBooking(bookingData: Booking) {
+  async createBooking(
+    bookingData: BookingData,
+  ): Promise<Response> {
     return this.apiClient.post('/booking', bookingData);
   }
 
-  async getBooking(bookingId: number) {
+  async getBooking(bookingId: number): Promise<Response> {
     return this.apiClient.get(`/booking/${bookingId}`);
   }
+
   async updateBooking(
-    bookingId: number,
-    bookingData: unknown,
-    token: string,
-  ) {
+    bookingData: Booking,
+  ): Promise<Response> {
+    const { bookingId, ...bookingDetails } = bookingData;
+
     return this.apiClient.put(
       `/booking/${bookingId}`,
-      bookingData,
-      token,
+      bookingDetails,
     );
   }
 
-  async deleteBooking(bookingId: number, token: string) {
-  return this.apiClient.delete(`/booking/${bookingId}`, token);
-}
+  async deleteBooking(bookingId: number): Promise<Response> {
+    return this.apiClient.delete(`/booking/${bookingId}`);
+  }
 }
