@@ -2,12 +2,12 @@
 import { test, expect, afterEach } from '@jest/globals';
 
 import { config } from '../config/config';
-import { ApiClient } from '../api/ApiClient';
+
 import { BookingApi } from '../api/BookingApi';
 import { createBookingData } from '../test-data/dataObject';
 
-const apiClient = new ApiClient(config.baseUrl);
-const bookingApi = new BookingApi(apiClient);
+
+const bookingApi = new BookingApi(config.baseUrl);
 
 let bookingId: number | undefined;
 

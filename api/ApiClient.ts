@@ -1,8 +1,27 @@
+import { validUser } from '../test-data/credentials';
+
 export class ApiClient {
+  private token?: string;
+  
+
+  constructor(private baseUrl: string) {
 
 
-  constructor(private baseUrl: string) {}
-   
+  }
+async getToken(): Promise<string> {
+  if (!this.token) {
+    const response = await this.post('/auth', {
+      username: validUser.username,
+      password: validUser.password,
+    });
+
+    const data = await response.json();
+
+    this.token = data.token;
+  }
+
+  return this.token!;
+}
   
   async post(url: string, data: unknown): Promise<Response> {
     return fetch(`${this.baseUrl}${url}`, {

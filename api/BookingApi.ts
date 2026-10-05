@@ -1,37 +1,27 @@
 import { ApiClient } from './ApiClient';
-import { Auth } from './Auth';
+
 import { Booking, BookingData } from '../test-data/dataObject';
-import { validUser } from '../test-data/credentials';
 
-export class BookingApi {
-  private readonly auth: Auth;
-  private token?: string;
 
-  constructor(private readonly apiClient: ApiClient) {
-    this.auth = new Auth(apiClient);
+export class BookingApi extends ApiClient{
+
+
+  constructor(baseUrl: string) {
+    super(baseUrl);
   }
 
-  private async getToken(): Promise<string> {
-    if (!this.token) {
-      this.token = await this.auth.getToken(
-        validUser.username,
-        validUser.password,
-      );
-    }
 
-    return this.token;
-  }
 
   async createBooking(
     bookingData: BookingData,
   ): Promise<Response> {
-    return this.apiClient.post('/booking', bookingData);
+    return this.post('/booking', bookingData);
   }
 
   async getBooking(
     bookingId: number,
   ): Promise<Response> {
-    return this.apiClient.get(`/booking/${bookingId}`);
+    return this.get(`/booking/${bookingId}`);
   }
 
   async updateBooking(
@@ -40,7 +30,7 @@ export class BookingApi {
     const { bookingId, ...bookingDetails } = bookingData;
     const token = await this.getToken();
 
-    return this.apiClient.put(
+    return this.put(
       `/booking/${bookingId}`,
       bookingDetails,
       token
@@ -52,7 +42,7 @@ export class BookingApi {
   ): Promise<Response> {
     const token = await this.getToken();
 
-    return this.apiClient.delete(
+    return this.delete(
       `/booking/${bookingId}`,
       token
     );
