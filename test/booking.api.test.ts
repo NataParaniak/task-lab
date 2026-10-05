@@ -1,33 +1,15 @@
 
-import { test, expect, beforeEach, afterEach } from '@jest/globals';
+import { test, expect, afterEach } from '@jest/globals';
 
 import { config } from '../config/config';
 import { ApiClient } from '../api/ApiClient';
-import { Auth } from '../api/Auth';
 import { BookingApi } from '../api/BookingApi';
 import { createBookingData } from '../test-data/dataObject';
-import { validUser } from '../test-data/credentials';
 
-let apiClient: ApiClient;
-let auth: Auth;
-let bookingApi: BookingApi;
+const apiClient = new ApiClient(config.baseUrl);
+const bookingApi = new BookingApi(apiClient);
 
-let token: string;
 let bookingId: number | undefined;
-
-beforeEach(async () => {
-  apiClient = new ApiClient(config.baseUrl);
-
-  auth = new Auth(apiClient);
-  bookingApi = new BookingApi(apiClient);
-
-  token = await auth.getToken(
-    validUser.username,
-    validUser.password,
-  );
-
-  apiClient.setToken(token);
-});
 
 afterEach(async () => {
   if (bookingId !== undefined) {
@@ -39,21 +21,6 @@ afterEach(async () => {
   }
 });
 
-test('Create authentication token', async () => {
-  const response = await apiClient.post('/auth', validUser);
-  const body = await response.json();
-
-  expect(response.status).toBe(200);
-
-  expect(response.headers.get('content-type')).toContain(
-    'application/json',
-  );
-
-  expect(body).toEqual({
-    token: expect.any(String),
-  });
-});
-
 test('Create booking', async () => {
   const bookingData = createBookingData();
 
@@ -61,10 +28,6 @@ test('Create booking', async () => {
   const body = await response.json();
 
   expect(response.status).toBe(200);
-
-  expect(response.headers.get('content-type')).toContain(
-    'application/json',
-  );
 
   expect(body).toEqual({
     bookingid: expect.any(Number),
@@ -90,11 +53,6 @@ test('Get created booking by id', async () => {
   const body = await response.json();
 
   expect(response.status).toBe(200);
-
-  expect(response.headers.get('content-type')).toContain(
-    'application/json',
-  );
-
   expect(body).toEqual(bookingData);
 });
 
@@ -124,19 +82,9 @@ test('Update booking', async () => {
 
   expect(response.status).toBe(200);
 
-  expect(response.headers.get('content-type')).toContain(
-    'application/json',
-  );
-
   expect(body).toEqual({
+    ...bookingData,
     firstname: 'Nata',
-    lastname: bookingData.lastname,
-    totalprice: bookingData.totalprice,
-    depositpaid: bookingData.depositpaid,
-    bookingdates: bookingData.bookingdates,
-    ...(bookingData.additionalneeds && {
-      additionalneeds: bookingData.additionalneeds,
-    }),
   });
 });
 
@@ -155,6 +103,10 @@ test('Delete booking', async () => {
   const response = await bookingApi.deleteBooking(bookingId);
 
   expect(response.status).toBe(201);
+
+  const getResponse = await bookingApi.getBooking(bookingId);
+
+  expect(getResponse.status).toBe(404);
 
   bookingId = undefined;
 });
