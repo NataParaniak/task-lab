@@ -28,12 +28,12 @@ export class BookingApi extends ApiClient{
     bookingData: Booking,
   ): Promise<Response> {
     const { bookingId, ...bookingDetails } = bookingData;
-    const token = await this.getToken();
+   
 
     return this.put(
       `/booking/${bookingId}`,
       bookingDetails,
-      token
+      
     );
   }
 
@@ -44,7 +44,7 @@ export class BookingApi extends ApiClient{
 
     return this.delete(
       `/booking/${bookingId}`,
-      token
+      
     );
   }
 }

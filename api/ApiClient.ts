@@ -37,7 +37,8 @@ async getToken(): Promise<string> {
     return fetch(`${this.baseUrl}${url}`);
   }
 
-  async put(url: string, data: unknown, token: string): Promise<Response> {
+  async put(url: string, data: unknown): Promise<Response> {
+     const token = await this.getToken();
     return fetch(`${this.baseUrl}${url}`, {
       method: 'PUT',
       headers: {
@@ -47,7 +48,8 @@ async getToken(): Promise<string> {
       body: JSON.stringify(data),
     });
   }
- async delete(url: string, token: string,) : Promise<Response>{
+ async delete(url: string) : Promise<Response>{
+   const token = await this.getToken();
   return fetch(`${this.baseUrl}${url}`, {
     method: 'DELETE',
     headers: {
