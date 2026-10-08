@@ -1,6 +1,6 @@
 import { ApiClient } from './ApiClient';
 
-import { Booking, BookingData } from '../test-data/dataObject';
+import { Booking, BookingData,createBookingData } from '../test-data/dataObject';
 
 
 export class BookingApi extends ApiClient{
@@ -30,21 +30,31 @@ export class BookingApi extends ApiClient{
     const { bookingId, ...bookingDetails } = bookingData;
    
 
-    return this.put(
-      `/booking/${bookingId}`,
-      bookingDetails,
-      
-    );
+    return this.put( `/booking/${bookingId}`, bookingDetails,);
   }
 
   async deleteBooking(
     bookingId: number,
   ): Promise<Response> {
-    const token = await this.getToken();
+   
 
     return this.delete(
       `/booking/${bookingId}`,
       
-    );
+    )}
+    
+async createBookingID(): Promise<number>{
+  const bookingData=createBookingData()
+  const response=await this.createBooking(bookingData);
+  const body=await response.json();
+  const bookingId=body.bookingid
+  if(bookingId===undefined){
+    throw new Error ('Booking ID was not created') 
   }
+ return bookingId
+
+}
+
+  
+
 }

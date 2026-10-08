@@ -9,17 +9,19 @@ import { createBookingData } from '../test-data/dataObject';
 
 const bookingApi = new BookingApi(config.baseUrl);
 
-let bookingId: number | undefined;
 
-afterEach(async () => {
-  if (bookingId !== undefined) {
-    console.log(`Cleanup: deleting booking ${bookingId}`);
+describe('Booking API', () => {
+  // let bookingId: number | undefined;
 
-    await bookingApi.deleteBooking(bookingId);
+  // afterEach(async () => {
+  //   if (bookingId !== undefined) {
+  //     console.log(`Cleanup: deleting booking ${bookingId}`);
 
-    bookingId = undefined;
-  }
-});
+  //     await bookingApi.deleteBooking(bookingId);
+
+  //     bookingId = undefined;
+  //   }
+  // });
 
 test('Create booking', async () => {
   const bookingData = createBookingData();
@@ -33,40 +35,32 @@ test('Create booking', async () => {
     bookingid: expect.any(Number),
     booking: bookingData,
   });
+  let bookingId=body.bookingid
+ let emptyResult=await bookingApi.deleteBooking(bookingId);
+ expect(emptyResult.status).toBe(201)
 
-  bookingId = body.bookingid;
+ let getResponse = await bookingApi.getBooking(bookingId);
+ expect(getResponse.status).toBe(404)
+ 
 });
 
 test('Get created booking by id', async () => {
-  const bookingData = createBookingData();
-
-  const createResponse = await bookingApi.createBooking(bookingData);
-  const createBody = await createResponse.json();
-
-  bookingId = createBody.bookingid;
-
-  if (bookingId === undefined) {
-    throw new Error('Booking ID was not created');
-  }
+   const bookingData = createBookingData();
+  let bookingId = await bookingApi.createBookingID();
 
   const response = await bookingApi.getBooking(bookingId);
   const body = await response.json();
 
   expect(response.status).toBe(200);
   expect(body).toEqual(bookingData);
+  await bookingApi.deleteBooking(bookingId)
 });
 
 test('Update booking', async () => {
   const bookingData = createBookingData();
 
-  const createResponse = await bookingApi.createBooking(bookingData);
-  const createBody = await createResponse.json();
-
-  bookingId = createBody.bookingid;
-
-  if (bookingId === undefined) {
-    throw new Error('Booking ID was not created');
-  }
+  let bookingId=await bookingApi.createBookingID()
+ 
 
   const updatedBookingData = {
     ...bookingData,
@@ -85,20 +79,16 @@ test('Update booking', async () => {
   expect(body).toEqual({
     ...bookingData,
     firstname: 'Nata',
+
+    
   });
+   await bookingApi.deleteBooking(bookingId)
 });
 
 test('Delete booking', async () => {
-  const bookingData = createBookingData();
 
-  const createResponse = await bookingApi.createBooking(bookingData);
-  const createBody = await createResponse.json();
 
-  bookingId = createBody.bookingid;
-
-  if (bookingId === undefined) {
-    throw new Error('Booking ID was not created');
-  }
+   let bookingId=await bookingApi.createBookingID()
 
   const response = await bookingApi.deleteBooking(bookingId);
 
@@ -108,10 +98,10 @@ test('Delete booking', async () => {
 
   expect(getResponse.status).toBe(404);
 
-  bookingId = undefined;
+  
 });
 
-
+ })
 
 
 
