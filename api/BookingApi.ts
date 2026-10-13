@@ -33,27 +33,17 @@ export class BookingApi extends ApiClient{
     return this.put( `/booking/${bookingId}`, bookingDetails,);
   }
 
-  async deleteBooking(
-    bookingId: number,
-  ): Promise<Response> {
-   
-
-    return this.delete(
-      `/booking/${bookingId}`,
-      
-    )}
-    
-async createBookingID(): Promise<number>{
-  const bookingData=createBookingData()
-  const response=await this.createBooking(bookingData);
-  const body=await response.json();
-  const bookingId=body.bookingid
-  if(bookingId===undefined){
-    throw new Error ('Booking ID was not created') 
-  }
- return bookingId
-
+async deleteBooking(
+  bookingId: number,
+  
+): Promise<Response> {
+  return this.delete(
+    `/booking/${bookingId}`,
+  
+  );
 }
+    
+
 
   
 

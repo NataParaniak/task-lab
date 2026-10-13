@@ -49,7 +49,7 @@ async getToken(): Promise<string> {
     });
   }
  async delete(url: string) : Promise<Response>{
-   const token = await this.getToken();
+  const token = await this.getToken();
   return fetch(`${this.baseUrl}${url}`, {
     method: 'DELETE',
     headers: {

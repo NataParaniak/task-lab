@@ -1,65 +1,56 @@
 
-import { test, expect, afterEach } from '@jest/globals';
+import { test, expect } from '@jest/globals';
 
 import { config } from '../config/config';
 
 import { BookingApi } from '../api/BookingApi';
-import { createBookingData } from '../test-data/dataObject';
 
+import { createBookingData } from '../test-data/dataObject';
+import {createBookingAndGetId} from '../helpers/bookingHelper'
 
 const bookingApi = new BookingApi(config.baseUrl);
 
 
 describe('Booking API', () => {
-  // let bookingId: number | undefined;
-
-  // afterEach(async () => {
-  //   if (bookingId !== undefined) {
-  //     console.log(`Cleanup: deleting booking ${bookingId}`);
-
-  //     await bookingApi.deleteBooking(bookingId);
-
-  //     bookingId = undefined;
-  //   }
-  // });
 
 test('Create booking', async () => {
   const bookingData = createBookingData();
+  let bookingId: number | undefined;
 
-  const response = await bookingApi.createBooking(bookingData);
-  const body = await response.json();
+  try {
+    const response = await bookingApi.createBooking(bookingData);
+    const body = await response.json();
 
-  expect(response.status).toBe(200);
+    expect(response.status).toBe(200);
+    expect(body.bookingid).toEqual(expect.any(Number));
+    expect(body.booking).toEqual(bookingData);
 
-  expect(body).toEqual({
-    bookingid: expect.any(Number),
-    booking: bookingData,
-  });
-  let bookingId=body.bookingid
- let emptyResult=await bookingApi.deleteBooking(bookingId);
- expect(emptyResult.status).toBe(201)
-
- let getResponse = await bookingApi.getBooking(bookingId);
- expect(getResponse.status).toBe(404)
- 
+    bookingId = body.bookingid;
+  } finally {
+    if (bookingId !== undefined) {
+      await bookingApi.deleteBooking(bookingId);
+    }
+  }
 });
 
 test('Get created booking by id', async () => {
    const bookingData = createBookingData();
-  let bookingId = await bookingApi.createBookingID();
+  let bookingId = await createBookingAndGetId(bookingApi);
 
   const response = await bookingApi.getBooking(bookingId);
   const body = await response.json();
-
+ try {
   expect(response.status).toBe(200);
   expect(body).toEqual(bookingData);
+    } finally {
   await bookingApi.deleteBooking(bookingId)
+    }
 });
 
 test('Update booking', async () => {
   const bookingData = createBookingData();
 
-  let bookingId=await bookingApi.createBookingID()
+  let bookingId=await createBookingAndGetId(bookingApi)
  
 
   const updatedBookingData = {
@@ -73,7 +64,7 @@ test('Update booking', async () => {
   );
 
   const body = await response.json();
-
+try{
   expect(response.status).toBe(200);
 
   expect(body).toEqual({
@@ -82,13 +73,15 @@ test('Update booking', async () => {
 
     
   });
+   } finally {
    await bookingApi.deleteBooking(bookingId)
+   }
 });
 
 test('Delete booking', async () => {
 
 
-   let bookingId=await bookingApi.createBookingID()
+   let bookingId=await createBookingAndGetId(bookingApi)
 
   const response = await bookingApi.deleteBooking(bookingId);
 
