@@ -10,14 +10,21 @@ import {createBookingAndGetId} from '../helpers/bookingHelper'
 
 const bookingApi = new BookingApi(config.baseUrl);
 
-
+const bookingIds: number[] = [];
 describe('Booking API', () => {
+    afterEach(async () => {
+    for (const bookingId of bookingIds) {
+      await bookingApi.deleteBooking(bookingId);
+    }
 
-test('Create booking', async () => {
+    bookingIds.length = 0;
+  });
+
+test.concurrent('Create booking', async () => {
   const bookingData = createBookingData();
-  let bookingId: number | undefined;
+ 
 
-  try {
+     
     const response = await bookingApi.createBooking(bookingData);
     const body = await response.json();
 
@@ -25,33 +32,28 @@ test('Create booking', async () => {
     expect(body.bookingid).toEqual(expect.any(Number));
     expect(body.booking).toEqual(bookingData);
 
-    bookingId = body.bookingid;
-  } finally {
-    if (bookingId !== undefined) {
-      await bookingApi.deleteBooking(bookingId);
-    }
-  }
+    let bookingId = body.bookingid;
+    bookingIds.push(bookingId)
+ 
 });
 
-test('Get created booking by id', async () => {
+test.concurrent('Get created booking by id', async () => {
    const bookingData = createBookingData();
   let bookingId = await createBookingAndGetId(bookingApi);
-
+  bookingIds.push(bookingId)
   const response = await bookingApi.getBooking(bookingId);
   const body = await response.json();
- try {
+ 
   expect(response.status).toBe(200);
   expect(body).toEqual(bookingData);
-    } finally {
-  await bookingApi.deleteBooking(bookingId)
-    }
+  
 });
 
-test('Update booking', async () => {
+test.concurrent('Update booking', async () => {
   const bookingData = createBookingData();
 
   let bookingId=await createBookingAndGetId(bookingApi)
- 
+ bookingIds.push(bookingId)
 
   const updatedBookingData = {
     ...bookingData,
@@ -64,7 +66,7 @@ test('Update booking', async () => {
   );
 
   const body = await response.json();
-try{
+
   expect(response.status).toBe(200);
 
   expect(body).toEqual({
@@ -73,12 +75,10 @@ try{
 
     
   });
-   } finally {
-   await bookingApi.deleteBooking(bookingId)
-   }
+ 
 });
 
-test('Delete booking', async () => {
+test.concurrent('Delete booking', async () => {
 
 
    let bookingId=await createBookingAndGetId(bookingApi)

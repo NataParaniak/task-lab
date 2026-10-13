@@ -4,7 +4,8 @@
   "description": "",
   "main": "index.js",
   "scripts": {
-    "test:api": "jest test"
+    "test:api": "jest test",
+     "test:parallel": "jest --maxWorkers=4"
   },
   "keywords": [],
   "author": "",
